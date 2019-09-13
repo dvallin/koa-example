@@ -8,6 +8,6 @@ export interface Mode {
 
 export function production(): Mode {
   const database = Database.production()
-  const user = User.production(database.database)
+  const user = User.production(database.postgres)
   return { database, user }
 }

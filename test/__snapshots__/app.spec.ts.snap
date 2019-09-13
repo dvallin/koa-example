@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`app runs migrations 1`] = `
+Array [
+  Object {
+    "config": Object {
+      "name": "create-user-table",
+      "text": "
+      CREATE TABLE IF NOT EXISTS koa_users (
+        email  VARCHAR(45) PRIMARY KEY,
+        name   VARCHAR(45)
+      );",
+    },
+  },
+]
+`;

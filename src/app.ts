@@ -1,6 +1,4 @@
-import { build, start } from './server'
+import { start } from './server'
 import { production } from './mode'
 
-const context = production()
-const app = build(context.user.routes)
-export const server = start(app)
+export const server = start(production())

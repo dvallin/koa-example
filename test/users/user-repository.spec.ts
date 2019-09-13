@@ -8,12 +8,12 @@ describe('user repository', () => {
 
   beforeEach(() => {
     const context = testing()
-    postgres = context.database.database as MockPostgres
+    postgres = context.database.postgres as MockPostgres
     repository = context.user.repository
   })
 
   it('responds', async () => {
-    postgres.backend.mockReturnValueOnce(['mocked user name'])
+    postgres.backend.mockReturnValueOnce([{ name: 'mocked user name' }])
 
     const userName = await repository.get('id')
 
