@@ -1,6 +1,6 @@
 import * as Koa from 'koa'
 import * as Router from 'koa-router'
-import * as combineControllers from 'koa-combine-routers'
+import * as combineRouters from 'koa-combine-routers'
 import { Server } from 'http'
 import { Mode } from './mode'
 
@@ -16,9 +16,9 @@ async function handleErrors(ctx: Koa.Context, next: () => Promise<any>) {
 
 export function build(...routes: Router[]): Koa {
   const app = new Koa()
-  const controllers = combineControllers(...routes)
+  const router = combineRouters(...routes)
   app.use(handleErrors)
-  app.use(controllers())
+  app.use(router())
   return app
 }
 

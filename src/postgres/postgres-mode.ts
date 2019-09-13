@@ -7,7 +7,5 @@ export interface Mode {
 
 export function production(): Mode {
   const pool = new Pool()
-  return {
-    postgres: new NonBlockingPostgres(pool),
-  }
+  return { postgres: new NonBlockingPostgres(pool) }
 }
