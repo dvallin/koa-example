@@ -24,7 +24,7 @@ export function build(...routes: Router[]): Koa {
 
 export async function startMode(mode: Mode, port: number | undefined = undefined): Promise<Server> {
   await mode.database.postgres.performMigrations()
-  return startApp(build(mode.user.routes))
+  return startApp(build(mode.user.routes), port)
 }
 
 export function startApp(app: Koa, port: number | undefined = undefined): Server {

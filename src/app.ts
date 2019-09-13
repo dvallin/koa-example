@@ -1,4 +1,4 @@
-import { start } from './server'
+import { startMode } from './server'
 import { production } from './mode'
 
-export const server = start(production())
+export const server = startMode(production())
