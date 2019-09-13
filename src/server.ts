@@ -2,6 +2,7 @@ import * as Koa from 'koa'
 import * as Router from 'koa-router'
 import * as combineControllers from 'koa-combine-routers'
 import { Server } from 'http'
+import { Mode } from './mode'
 
 async function handleErrors(ctx: Koa.Context, next: () => Promise<any>) {
   try {
@@ -21,6 +22,11 @@ export function build(...routes: Router[]): Koa {
   return app
 }
 
-export function start(app: Koa, port: number | undefined = undefined): Server {
+export async function startMode(mode: Mode, port: number | undefined = undefined): Promise<Server> {
+  await mode.database.postgres.performMigrations()
+  return startApp(build(mode.user.routes))
+}
+
+export function startApp(app: Koa, port: number | undefined = undefined): Server {
   return app.listen(port || process.env.SERVER_PORT)
 }

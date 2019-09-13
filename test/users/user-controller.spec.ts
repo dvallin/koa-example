@@ -1,5 +1,5 @@
 import { routes } from '../../src/users/user-routes'
-import { start, build } from '../../src/server'
+import { build, startApp } from '../../src/server'
 
 import * as request from 'supertest'
 import { Server } from 'http'
@@ -10,7 +10,7 @@ describe('user controller', () => {
   beforeEach(() => {
     const context = testing()
     context.user.repository.get = () => Promise.resolve('mocked user')
-    server = start(build(routes(context.user.service)))
+    server = startApp(build(routes(context.user.service)))
   })
 
   afterEach(() => {

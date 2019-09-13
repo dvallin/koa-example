@@ -9,6 +9,6 @@ export interface Mode {
 
 export function testing(): Mode {
   const database = MockDatabase.testing()
-  const user = User.production(database.database)
+  const user = User.production(database.postgres)
   return { database, user }
 }

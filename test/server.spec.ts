@@ -1,4 +1,4 @@
-import { build, start } from '../src/server'
+import { build, startApp } from '../src/server'
 
 import * as Router from 'koa-router'
 import * as request from 'supertest'
@@ -16,7 +16,7 @@ describe('server', () => {
       throw Error('something bad happened')
     })
 
-    server = start(build(router))
+    server = startApp(build(router))
   })
 
   it('succeeds', async () => {
