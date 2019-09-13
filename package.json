@@ -10,7 +10,7 @@
     "integration": "jest --config=jest-integration.conf.js",
     "integration:watch": "jest --config=jest-integration.conf.js --watch",
     "format": "prettier --config .prettierrc.yaml --write '{src,integration-test,test}/**/*.{ts,tsx,js,jsx,html}'",
-    "start": "node --inspect=5858 -r ts-node/register ./src/server.ts",
+    "start": "node --inspect=5858 -r ts-node/register ./src/app.ts",
     "start:watch": "nodemon"
   },
   "author": "",
