@@ -1,13 +1,10 @@
 import * as Router from 'koa-router'
 import { UserService } from './user-service'
-import { Middleware } from 'koa'
 
-export function routes(service: UserService): Router {
-  const router = new Router({ prefix: '/users' })
+export function router(service: UserService): Router {
+  const router = new Router({ prefix: '/users-functional' })
 
-  router.get('/', async (ctx: Router.RouterContext, _next: Middleware) => {
-    ctx.body = await service.get()
-  })
+  router.get('/', ctx => service.getSomeUserName(2).subscribe(userName => (ctx.body = userName)))
 
   return router
 }

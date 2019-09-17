@@ -10,7 +10,7 @@ describe('app', () => {
   let server: Server
   beforeEach(async () => {
     const mode = testing()
-    postgres = mode.database.postgres as MockPostgres
+    postgres = mode.io.postgres as MockPostgres
     server = await startMode(mode)
   })
 

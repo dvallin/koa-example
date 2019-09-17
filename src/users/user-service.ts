@@ -1,13 +1,11 @@
+import { Observable } from 'rxjs'
 import { UserRepository } from './user-repository'
+import { mergeMap } from 'rxjs/operators'
 
-export interface UserService {
-  get(): Promise<string>
-}
+export class UserService {
+  constructor(private readonly repo: UserRepository) {}
 
-export class UserServiceImpl implements UserService {
-  constructor(private readonly repository: UserRepository) {}
-
-  async get(): Promise<string> {
-    return this.repository.get('some-user')
+  getSomeUserName(id: number): Observable<string> {
+    return this.repo.getSomeUserEmail(id).pipe(mergeMap(p => this.repo.fetchUserFromDb(p[0])))
   }
 }

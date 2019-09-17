@@ -21,7 +21,9 @@
     "koa": "^2.8.1",
     "koa-combine-routers": "^4.0.2",
     "koa-router": "^7.4.0",
-    "pg": "^7.12.1"
+    "koa-rx": "^0.1.1",
+    "pg": "^7.12.1",
+    "rxjs": "^6.5.3"
   },
   "devDependencies": {
     "@types/jest": "^24.0.18",

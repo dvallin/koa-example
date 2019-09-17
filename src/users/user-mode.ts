@@ -1,18 +1,17 @@
+import { UserService } from './user-service'
+import { UserRepository } from './user-repository'
+import { router as userRouter } from './user-routes'
 import * as Router from 'koa-router'
-
-import { UserRepository, UserRepositoryImpl } from './user-repository'
-import { UserService, UserServiceImpl } from './user-service'
-import { Postgres } from '../postgres/postgres'
-import { routes } from './user-routes'
+import * as IO from '../io/mode'
 
 export interface Mode {
-  repository: UserRepository
   service: UserService
-  routes: Router
+  repository: UserRepository
 }
 
-export function production(postgres: Postgres): Mode {
-  const repository = new UserRepositoryImpl(postgres)
-  const service = new UserServiceImpl(repository)
-  return { repository, service, routes: routes(service) }
+export function production(io: IO.Mode): { mode: Mode; router: Router } {
+  const repository = new UserRepository(io)
+  const service = new UserService(repository)
+  const mode = { repository, service }
+  return { mode, router: userRouter(service) }
 }

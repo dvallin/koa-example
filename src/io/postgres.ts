@@ -3,9 +3,6 @@ import { Pool, QueryConfig, QueryResult } from 'pg'
 export interface Postgres {
   performQuery<T>(query: Query): Promise<QueryResult<T>>
   performQueries<T>(...queries: Query[]): Promise<QueryResult<T>[]>
-
-  registerMigrations(...queries: Query[]): void
-  performMigrations(): Promise<void>
 }
 
 export interface Query {
@@ -14,8 +11,6 @@ export interface Query {
 }
 
 export class NonBlockingPostgres implements Postgres {
-  private migrations: Query[] = []
-
   constructor(private readonly pool: Pool) {}
 
   async performQuery<T>(query: Query): Promise<QueryResult<T>> {
@@ -29,13 +24,5 @@ export class NonBlockingPostgres implements Postgres {
     } finally {
       client.release()
     }
-  }
-
-  registerMigrations(...queries: Query[]) {
-    this.migrations.push(...queries)
-  }
-
-  async performMigrations(): Promise<void> {
-    await this.performQueries(...this.migrations)
   }
 }

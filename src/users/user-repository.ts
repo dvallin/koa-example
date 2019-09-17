@@ -1,9 +1,8 @@
-import { Postgres, Query } from '../postgres/postgres'
+import { Query } from '../io/postgres'
 import { QueryConfig } from 'pg'
-
-export interface UserRepository {
-  get(email: string): Promise<string>
-}
+import { Observable, of, from } from 'rxjs'
+import { map } from 'rxjs/operators'
+import { Mode } from '../io/mode'
 
 const TABLE_NAME = 'koa_users'
 
@@ -26,13 +25,15 @@ export const fetchUserCommand: QueryConfig = {
   values: [1],
 }
 
-export class UserRepositoryImpl implements UserRepository {
-  constructor(private readonly postgres: Postgres) {
-    this.postgres.registerMigrations(...migrations)
+export class UserRepository {
+  constructor(private readonly io: Mode) {}
+
+  fetchUserFromDb(email: string): Observable<string> {
+    const query = this.io.postgres.performQuery<{ name: string }>({ config: fetchUserCommand, values: [email] })
+    return from(query).pipe(map(records => records.rows[0].name))
   }
 
-  async get(email: string): Promise<string> {
-    const result = await this.postgres.performQuery<{ name: string }>({ config: fetchUserCommand, values: [email] })
-    return result.rows[0].name
+  getSomeUserEmail(id: number): Observable<string> {
+    return of(`${id}@otto.de`)
   }
 }

@@ -1,21 +1,21 @@
 import { testing } from '../test-mode'
 import { MockPostgres } from '../database/mock-database'
-import { UserRepository, fetchUserCommand } from '../../src/users/user-repository'
+import { fetchUserCommand, fetchUserFromDb } from '../../src/users/user-repository'
+import { Mode } from '../../src/mode'
 
 describe('user repository', () => {
+  let mode: Mode
   let postgres: MockPostgres
-  let repository: UserRepository
 
   beforeEach(() => {
-    const context = testing()
-    postgres = context.database.postgres as MockPostgres
-    repository = context.user.repository
+    mode = testing()
+    postgres = mode.io.postgres as MockPostgres
   })
 
   it('responds', async () => {
     postgres.backend.mockReturnValueOnce([{ name: 'mocked user name' }])
 
-    const userName = await repository.get('id')
+    const userName = await fetchUserFromDb(mode.io, 'email').toPromise()
 
     expect(userName).toEqual('mocked user name')
     expect(postgres.backend).toHaveBeenCalledWith(fetchUserCommand, ['id'])

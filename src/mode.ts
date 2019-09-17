@@ -1,13 +1,21 @@
+import * as Router from 'koa-router'
+import * as IO from './io/mode'
+
+import { Query } from './io/postgres'
+
 import * as User from './users/user-mode'
-import * as Database from './postgres/postgres-mode'
+import { migrations as userMigrations } from './users/user-repository'
 
 export interface Mode {
-  database: Database.Mode
+  io: IO.Mode
   user: User.Mode
+
+  routers: Router[]
+  migrations: Query[]
 }
 
 export function production(): Mode {
-  const database = Database.production()
-  const user = User.production(database.postgres)
-  return { database, user }
+  const io = IO.production()
+  const user = User.production(io)
+  return { io, user: user.mode, routers: [user.router], migrations: [...userMigrations] }
 }
