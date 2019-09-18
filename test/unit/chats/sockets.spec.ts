@@ -14,25 +14,8 @@ describe('chat socket', () => {
   testMode(testing, 'can join room and send messages to it', async (_server, mode, port) => {
     return new Promise(resolve => {
       const postgres = mode.io.postgres as MockPostgres
-      const socket1 = ws(`http://localhost:${port}`)
-      const socket2 = ws(`http://localhost:${port}`)
-      socket1.emit('join', 'secret room')
-      socket2.emit('join', 'secret room')
-
-      socket1.emit('chat message', 'socket1> hello socket 2')
-      socket2.emit('chat message', 'socket2> hello socket 1')
-
-      let socket1Messages: Message[] = []
-      let socket2Messages: Message[] = []
-      const receiveMessage = (into: Message[]) => {
-        return (msg: SerializedMessage) => {
-          into.push({ ...msg, date: new Date(msg.date) })
-          tryResolve()
-        }
-      }
-
-      socket1.on('chat message', receiveMessage(socket1Messages))
-      socket2.on('chat message', receiveMessage(socket2Messages))
+      const socket1Messages: Message[] = []
+      const socket2Messages: Message[] = []
 
       const tryResolve = () => {
         // both clients have received 2 messages
@@ -48,6 +31,24 @@ describe('chat socket', () => {
           resolve()
         }
       }
+
+      const socket1 = ws(`http://localhost:${port}`)
+      const socket2 = ws(`http://localhost:${port}`)
+      socket1.emit('join', 'secret room')
+      socket2.emit('join', 'secret room')
+
+      socket1.emit('chat message', 'socket1> hello socket 2')
+      socket2.emit('chat message', 'socket2> hello socket 1')
+
+      const receiveMessage = (into: Message[]) => {
+        return (msg: SerializedMessage) => {
+          into.push({ ...msg, date: new Date(msg.date) })
+          tryResolve()
+        }
+      }
+
+      socket1.on('chat message', receiveMessage(socket1Messages))
+      socket2.on('chat message', receiveMessage(socket2Messages))
     })
   })
 })

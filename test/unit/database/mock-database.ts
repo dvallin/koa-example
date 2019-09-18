@@ -8,7 +8,7 @@ export class MockPostgres implements Postgres {
   public performedQueries: QueryConfig[] = []
   public backend = jest.fn<any[], any>()
 
-  private id: number = 0
+  private id = 0
 
   async performQuery<T>(query: QueryConfig): Promise<QueryResult<T>> {
     this.performedQueries.push(query)

@@ -1,3 +1,4 @@
+import * as Koa from 'koa'
 import * as Router from 'koa-router'
 import * as request from 'supertest'
 
@@ -5,7 +6,7 @@ import { build } from '../../src/server'
 import { testApp } from '../test-wrappers'
 
 describe('server', () => {
-  function exampleApp() {
+  function exampleApp(): Koa {
     const router = new Router({})
 
     router.get('/succeeds', async (ctx, _next) => {

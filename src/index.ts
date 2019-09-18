@@ -31,6 +31,19 @@ export interface Mode {
   exports: ModuleExports
 }
 
+async function callHooks(hooks: Hook[]): Promise<void> {
+  await Promise.all(hooks.map(hook => hook()))
+}
+
+export function mergeExports(...moduleExports: Partial<ModuleExports>[]): ModuleExports {
+  const startup = (): Promise<void> => callHooks(pluck(moduleExports, 'startup'))
+  const shutdown = (): Promise<void> => callHooks(pluck(moduleExports, 'shutdown'))
+  const migrations = [].concat(...pluck(moduleExports, 'migrations'))
+  const middlewares = [].concat(...pluck(moduleExports, 'middlewares'))
+  const socketHandlers = [].concat(...pluck(moduleExports, 'socketHandlers'))
+  return { startup, shutdown, migrations, middlewares, socketHandlers }
+}
+
 export function production(): Mode {
   const io = IO.production()
   const users = Users.production(io.components)
@@ -41,17 +54,4 @@ export function production(): Mode {
     chats: chats.components,
     exports: mergeExports(io.exports, users.exports, chats.exports),
   }
-}
-
-async function callHooks(hooks: Hook[]): Promise<void> {
-  await Promise.all(hooks.map(hook => hook()))
-}
-
-export function mergeExports(...moduleExports: Partial<ModuleExports>[]): ModuleExports {
-  const startup = () => callHooks(pluck(moduleExports, 'startup'))
-  const shutdown = () => callHooks(pluck(moduleExports, 'shutdown'))
-  const migrations = [].concat(...pluck(moduleExports, 'migrations'))
-  const middlewares = [].concat(...pluck(moduleExports, 'middlewares'))
-  const socketHandlers = [].concat(...pluck(moduleExports, 'socketHandlers'))
-  return { startup, shutdown, migrations, middlewares, socketHandlers }
 }

@@ -11,7 +11,7 @@ export function production(): Module<Components> {
   return {
     components: { postgres: new NonBlockingPostgres(pool) },
     exports: {
-      shutdown: () => pool.end(),
+      shutdown: (): Promise<void> => pool.end(),
     },
   }
 }

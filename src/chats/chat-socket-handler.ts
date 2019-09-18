@@ -3,7 +3,7 @@ import { ChatService } from './chat-service'
 import { Socket, Server } from 'socket.io'
 import { Message } from '.'
 
-function leavAllRooms(socket: Socket) {
+function leavAllRooms(socket: Socket): void {
   Object.keys(socket.rooms).forEach(room => socket.leave(room))
 }
 
@@ -12,7 +12,7 @@ function sendToRoom(server: Server, room: string, message: Message): void {
 }
 
 export function buildChatSocketHandler(service: ChatService): SocketHandler {
-  return (server, socket) => {
+  return (server, socket): void => {
     leavAllRooms(socket)
     socket.on('join', newRoom => {
       leavAllRooms(socket)

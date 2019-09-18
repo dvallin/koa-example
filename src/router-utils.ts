@@ -11,7 +11,7 @@ export function get<T>(
     method: 'get',
     path,
     validate: { params },
-    handler: (ctx, next) => handle(ctx, next, ctx.params),
+    handler: (ctx, next): Promise<void> => handle(ctx, next, ctx.params),
   }
 }
 
@@ -27,6 +27,6 @@ export function post<T>(
       type: 'json',
       body,
     },
-    handler: (ctx: Context, next: Middleware) => handle(ctx, next, ctx.request.body),
+    handler: (ctx, next): Promise<void> => handle(ctx, next, ctx.request.body),
   }
 }

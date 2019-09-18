@@ -5,11 +5,12 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
+    "lint": "eslint '{src,test}/**/*.{ts,tsx}'",
+    "format": "prettier --config .prettierrc.yaml --write '{src,test}/**/*.{ts,tsx,js,jsx,html}'",
     "unit": "jest --config=jest-unit.conf.js --detectOpenHandles",
     "unit:watch": "jest --config=jest-unit.conf.js --watch",
     "integration": "jest --config=jest-integration.conf.js --run-in-band",
     "integration:watch": "jest --config=jest-integration.conf.js --run-in-band --watch",
-    "format": "prettier --config .prettierrc.yaml --write '{src,integration-test,test}/**/*.{ts,tsx,js,jsx,html}'",
     "start": "node --inspect=5858 -r ts-node/register ./src/app.ts",
     "start:watch": "nodemon"
   },
@@ -32,6 +33,9 @@
     "@types/socket.io": "^2.1.2",
     "@types/socket.io-client": "^1.4.32",
     "@types/supertest": "^2.0.8",
+    "@typescript-eslint/eslint-plugin": "^2.3.0",
+    "@typescript-eslint/parser": "^2.3.0",
+    "eslint": "^6.4.0",
     "jest": "^24.9.0",
     "nodemon": "^1.19.2",
     "prettier": "^1.18.2",
