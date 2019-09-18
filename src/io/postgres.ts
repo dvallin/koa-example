@@ -3,6 +3,7 @@ import { Pool, QueryConfig, QueryResult } from 'pg'
 export interface Postgres {
   performQuery<T>(query: QueryConfig): Promise<QueryResult<T>>
   performQueries<T>(queries: QueryConfig[]): Promise<QueryResult<T>[]>
+  performTransaction<T>(queries: QueryConfig[]): Promise<void>
 }
 
 export function createQuery(text: string): QueryConfig {
@@ -25,6 +26,23 @@ export class NonBlockingPostgres implements Postgres {
     const client = await this.pool.connect()
     try {
       return await Promise.all(queries.map(query => client.query(query)))
+    } catch (e) {
+      console.error(e)
+      throw e
+    } finally {
+      client.release()
+    }
+  }
+
+  async performTransaction(queries: QueryConfig[]): Promise<void> {
+    const client = await this.pool.connect()
+    try {
+      await client.query('BEGIN')
+      await Promise.all(queries.map(query => client.query(query)))
+      await client.query('COMMIT')
+    } catch (e) {
+      await client.query('ROLLBACK')
+      throw e
     } finally {
       client.release()
     }

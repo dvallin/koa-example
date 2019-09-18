@@ -9,7 +9,7 @@ describe('user repository', () => {
   beforeEach(() => {
     const context = testing()
     postgres = context.io.postgres as MockPostgres
-    repository = context.user.repository
+    repository = context.users.repository
   })
 
   it('gets users', async () => {
