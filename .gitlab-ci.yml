@@ -1,0 +1,15 @@
+image: node:latest
+
+cache:
+  paths:
+    - node_modules/
+
+test_unit:
+  script:
+    - npm install
+    - npm run unit
+
+test_integration:
+  script:
+    - npm install
+    - npm run integration
