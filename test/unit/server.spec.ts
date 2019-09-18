@@ -1,12 +1,11 @@
-import { build, startApp } from '../src/server'
-
 import * as Router from 'koa-router'
 import * as request from 'supertest'
-import { Server } from 'http'
+
+import { build } from '../../src/server'
+import { testApp } from '../test-wrappers'
 
 describe('server', () => {
-  let server: Server
-  beforeEach(() => {
+  function exampleApp() {
     const router = new Router({})
 
     router.get('/succeeds', async (ctx, _next) => {
@@ -16,10 +15,10 @@ describe('server', () => {
       throw Error('something bad happened')
     })
 
-    server = startApp(build(router))
-  })
+    return build([router])
+  }
 
-  it('succeeds', async () => {
+  testApp(exampleApp, 'succeeds', async server => {
     console.error = jest.fn()
 
     const response = await request(server).get('/succeeds')
@@ -28,7 +27,7 @@ describe('server', () => {
     expect(console.error).not.toHaveBeenCalled()
   })
 
-  it('throwing', async () => {
+  testApp(exampleApp, 'throws', async server => {
     console.error = jest.fn()
 
     const response = await request(server).get('/throws')
