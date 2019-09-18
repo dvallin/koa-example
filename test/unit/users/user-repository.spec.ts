@@ -12,7 +12,7 @@ describe('user repository', () => {
     repository = context.user.repository
   })
 
-  it('responds', async () => {
+  it('gets users', async () => {
     // given
     postgres.backend.mockReturnValueOnce([{ name: 'mocked user name' }])
 
@@ -25,6 +25,17 @@ describe('user repository', () => {
       name: 'fetch-user',
       text: 'SELECT name FROM koa_users WHERE email = $1',
       values: ['id'],
+    })
+  })
+  it('creates users', async () => {
+    // when
+    await repository.create({ name: 'test-name', email: 'test-email' })
+
+    // then
+    expect(postgres.backend).toHaveBeenCalledWith({
+      name: 'create-user',
+      text: 'INSERT INTO koa_users (email, name) VALUES ($1, $2);',
+      values: ['test-email', 'test-name'],
     })
   })
 })

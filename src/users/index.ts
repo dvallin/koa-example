@@ -10,8 +10,13 @@ export interface Components {
   service: UserService
 }
 
+export interface User {
+  name: string
+  email: string
+}
+
 export function production(io: IO.Components): Module<Components> {
   const repository = new UserRepositoryImpl(io.postgres)
   const service = new UserServiceImpl(repository)
-  return { components: { repository, service }, exports: { routers: [router(service)], migrations: migrations } }
+  return { components: { repository, service }, exports: { middlewares: [router(service)], migrations: migrations } }
 }

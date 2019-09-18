@@ -1,8 +1,8 @@
 import * as User from './users'
 import * as IO from './io'
-import * as Router from 'koa-router'
 import { pluck } from './array-utils'
 import { QueryConfig } from 'pg'
+import { Middleware } from 'koa'
 
 export type Hook = () => Promise<void>
 
@@ -10,7 +10,7 @@ export interface ModuleExports {
   startup: Hook
   shutdown: Hook
 
-  routers: Router[]
+  middlewares: Middleware[]
   migrations: QueryConfig[]
 }
 
@@ -40,6 +40,6 @@ export function mergeExports(...moduleExports: Partial<ModuleExports>[]): Module
   const startup = () => callHooks(pluck(moduleExports, 'startup'))
   const shutdown = () => callHooks(pluck(moduleExports, 'shutdown'))
   const migrations = [].concat(...pluck(moduleExports, 'migrations'))
-  const routers = [].concat(...pluck(moduleExports, 'routers'))
-  return { startup, shutdown, migrations, routers }
+  const middlewares = [].concat(...pluck(moduleExports, 'middlewares'))
+  return { startup, shutdown, migrations, middlewares }
 }

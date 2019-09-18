@@ -15,7 +15,7 @@ describe('server', () => {
       throw Error('something bad happened')
     })
 
-    return build([router])
+    return build([router.middleware()])
   }
 
   testApp(exampleApp, 'succeeds', async server => {

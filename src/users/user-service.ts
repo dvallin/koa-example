@@ -1,13 +1,19 @@
 import { UserRepository } from './user-repository'
+import { User } from '.'
 
 export interface UserService {
-  get(): Promise<string>
+  get(email: string): Promise<string>
+  create(user: User): Promise<void>
 }
 
 export class UserServiceImpl implements UserService {
   constructor(private readonly repository: UserRepository) {}
 
-  async get(): Promise<string> {
-    return this.repository.get('some-user')
+  async get(email: string): Promise<string> {
+    return this.repository.get(email)
+  }
+
+  async create(user: User): Promise<void> {
+    return this.repository.create(user)
   }
 }

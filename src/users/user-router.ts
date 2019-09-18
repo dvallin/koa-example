@@ -1,13 +1,36 @@
-import * as Router from 'koa-router'
+import * as Router from 'koa-joi-router'
 import { UserService } from './user-service'
-import { Middleware } from 'koa'
+import { Middleware, Context } from 'koa'
+import { User } from '.'
+import { get, post } from '../router-utils'
 
-export function router(service: UserService): Router {
-  const router = new Router({ prefix: '/users' })
+const joi = Router.Joi
+const email = joi
+  .string()
+  .email()
+  .required()
+const name = joi
+  .string()
+  .min(3)
+  .required()
+const getUserParameters = { email }
+const createUserBody = { name, email }
 
-  router.get('/', async (ctx: Router.RouterContext, _next: Middleware) => {
-    ctx.body = await service.get()
-  })
+export function router(service: UserService): Middleware {
+  const router = Router()
 
-  return router
+  router.route(
+    get('/users/:email', getUserParameters, async (ctx, _next, params: { email: string }) => {
+      ctx.body = await service.get(params.email)
+    })
+  )
+
+  router.route(
+    post('/users', createUserBody, async (ctx: Context, _next: Middleware, user: User) => {
+      await service.create(user)
+      ctx.status = 201
+    })
+  )
+
+  return router.middleware()
 }
