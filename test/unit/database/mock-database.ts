@@ -25,6 +25,10 @@ export class MockPostgres implements Postgres {
   async performQueries<T>(queries: QueryConfig[]): Promise<QueryResult<T>[]> {
     return Promise.all(queries.map(q => this.performQuery(q)))
   }
+
+  async performTransaction(queries: QueryConfig[]): Promise<void> {
+    Promise.all(queries.map(q => this.performQuery(q)))
+  }
 }
 
 export function testing(): Module<Components> {

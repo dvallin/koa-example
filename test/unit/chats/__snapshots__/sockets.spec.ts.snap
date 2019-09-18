@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`chat socket with running server can join room and send messages to it 1`] = `
+Array [
+  Object {
+    "date": "<date overriden>",
+    "message": "socket1> hello socket 2",
+    "room": "secret room",
+  },
+  Object {
+    "date": "<date overriden>",
+    "message": "socket2> hello socket 1",
+    "room": "secret room",
+  },
+]
+`;

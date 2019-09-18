@@ -8,5 +8,13 @@ Array [
         name   VARCHAR(45)
       );",
   },
+  Object {
+    "text": "CREATE TABLE IF NOT EXISTS chat_messages (
+        room  VARCHAR(45),
+        date  TIMESTAMP,
+        message   TEXT,
+        PRIMARY KEY(room, date)
+      );",
+  },
 ]
 `;

@@ -6,7 +6,7 @@ describe('user controller', () => {
   describe('get user', () => {
     testMode(testing, 'gets a user', async (server, mode) => {
       // given
-      mode.user.repository.get = jest.fn(() => Promise.resolve('mocked user'))
+      mode.users.repository.get = jest.fn(() => Promise.resolve('mocked user'))
 
       // when
       const response = await request(server).get('/users/user1@gmail.com')
@@ -18,12 +18,12 @@ describe('user controller', () => {
       expect(response.text).toEqual('mocked user')
       expect(response.body).toEqual({})
 
-      expect(mode.user.repository.get).toHaveBeenCalledWith('user1@gmail.com')
+      expect(mode.users.repository.get).toHaveBeenCalledWith('user1@gmail.com')
     })
 
     testMode(testing, 'validates for correct email', async (server, mode) => {
       // given
-      mode.user.repository.get = jest.fn(() => Promise.resolve('mocked user'))
+      mode.users.repository.get = jest.fn(() => Promise.resolve('mocked user'))
 
       // when
       const response = await request(server).get('/users/user1gmail.com')
@@ -40,14 +40,14 @@ describe('user controller', () => {
         },
       ])
 
-      expect(mode.user.repository.get).not.toHaveBeenCalled()
+      expect(mode.users.repository.get).not.toHaveBeenCalled()
     })
   })
 
   describe('create user', () => {
     testMode(testing, 'create a user', async (server, mode) => {
       // given
-      mode.user.repository.create = jest.fn(() => Promise.resolve())
+      mode.users.repository.create = jest.fn(() => Promise.resolve())
 
       // when
       const response = await request(server)
@@ -61,12 +61,12 @@ describe('user controller', () => {
       expect(response.type).toEqual('text/plain')
       expect(response.text).toEqual('Created')
 
-      expect(mode.user.repository.create).toHaveBeenCalledWith({ name: 'john', email: 'john@doe.com' })
+      expect(mode.users.repository.create).toHaveBeenCalledWith({ name: 'john', email: 'john@doe.com' })
     })
 
     testMode(testing, 'validates users name', async (server, mode) => {
       // given
-      mode.user.repository.create = jest.fn(() => Promise.resolve())
+      mode.users.repository.create = jest.fn(() => Promise.resolve())
 
       // when
       const response = await request(server)
@@ -87,12 +87,12 @@ describe('user controller', () => {
         },
       ])
 
-      expect(mode.user.repository.create).not.toHaveBeenCalled()
+      expect(mode.users.repository.create).not.toHaveBeenCalled()
     })
 
     testMode(testing, 'validates email', async (server, mode) => {
       // given
-      mode.user.repository.create = jest.fn(() => Promise.resolve())
+      mode.users.repository.create = jest.fn(() => Promise.resolve())
 
       // when
       const response = await request(server)
@@ -113,7 +113,7 @@ describe('user controller', () => {
         },
       ])
 
-      expect(mode.user.repository.create).not.toHaveBeenCalled()
+      expect(mode.users.repository.create).not.toHaveBeenCalled()
     })
   })
 })
