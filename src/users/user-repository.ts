@@ -1,4 +1,4 @@
-import { Postgres, Query } from '../postgres/postgres'
+import { Postgres, createQuery, createPreparedQuery } from '../io/postgres'
 import { QueryConfig } from 'pg'
 
 export interface UserRepository {
@@ -7,32 +7,23 @@ export interface UserRepository {
 
 const TABLE_NAME = 'koa_users'
 
-export const migrations: Query[] = [
-  {
-    config: {
-      name: 'create-user-table',
-      text: `
-      CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (
+export const migrations: QueryConfig[] = [
+  `CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (
         email  VARCHAR(45) PRIMARY KEY,
         name   VARCHAR(45)
       );`,
-    },
-  },
-]
+].map(text => createQuery(text))
 
-export const fetchUserCommand: QueryConfig = {
-  name: 'fetch-user',
-  text: `SELECT name FROM ${TABLE_NAME} WHERE email = $1`,
-  values: [1],
+const commands = {
+  'fetch-user': `SELECT name FROM ${TABLE_NAME} WHERE email = $1`,
 }
 
 export class UserRepositoryImpl implements UserRepository {
-  constructor(private readonly postgres: Postgres) {
-    this.postgres.registerMigrations(...migrations)
-  }
+  constructor(private readonly postgres: Postgres) {}
 
   async get(email: string): Promise<string> {
-    const result = await this.postgres.performQuery<{ name: string }>({ config: fetchUserCommand, values: [email] })
+    const command = createPreparedQuery(commands, 'fetch-user', email)
+    const result = await this.postgres.performQuery<{ name: string }>(command)
     return result.rows[0].name
   }
 }
