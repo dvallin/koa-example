@@ -4,6 +4,11 @@ cache:
   paths:
     - node_modules/
 
+test_lint_and_format:
+  script:
+    - npm run fmt
+    - npm run lint
+
 test_unit:
   script:
     - npm install
@@ -13,3 +18,9 @@ test_integration:
   script:
     - npm install
     - npm run integration
+
+build_and_package:
+  script:
+    - npm install
+    - npm run build
+    - docker build -t koa-example:latest .

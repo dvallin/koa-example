@@ -12,7 +12,8 @@
     "integration": "jest --config=jest-integration.conf.js --run-in-band",
     "integration:watch": "jest --config=jest-integration.conf.js --run-in-band --watch",
     "start": "node --inspect=5858 -r ts-node/register ./src/app.ts",
-    "start:watch": "nodemon"
+    "start:watch": "nodemon",
+    "dev": "node -r ts-node/register ./bin/dev.ts"
   },
   "author": "",
   "license": "ISC",
