@@ -21,13 +21,13 @@ export function router(service: UserService): Middleware {
 
   router.route(
     get('/users/:email', getUserParameters, async (ctx, _next, params: { email: string }) => {
-      ctx.body = await service.get(params.email)
+      ctx.body = await service.get(params.email)({ id: ctx.state.id })
     })
   )
 
   router.route(
     post('/users', createUserBody, async (ctx: Context, _next: Middleware, user: User) => {
-      await service.create(user)
+      await service.create(user)({ id: ctx.state.id })
       ctx.status = 201
     })
   )

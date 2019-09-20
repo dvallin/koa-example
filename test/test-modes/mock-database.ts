@@ -1,8 +1,6 @@
 import { QueryResult, QueryConfig } from 'pg'
 
-import { Postgres } from '../../../src/io/postgres'
-import { Components } from '../../../src/io'
-import { Module } from '../../../src'
+import { Postgres } from '../../src/io/postgres'
 
 export class MockPostgres implements Postgres {
   public performedQueries: QueryConfig[] = []
@@ -28,12 +26,5 @@ export class MockPostgres implements Postgres {
 
   async performTransaction(queries: QueryConfig[]): Promise<void> {
     Promise.all(queries.map(q => this.performQuery(q)))
-  }
-}
-
-export function testing(): Module<Components> {
-  return {
-    components: { postgres: new MockPostgres() },
-    exports: {},
   }
 }

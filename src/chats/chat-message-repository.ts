@@ -1,9 +1,11 @@
 import { Postgres, createQuery, createPreparedQuery } from '../io/postgres'
 import { QueryConfig } from 'pg'
 import { Message } from '.'
+import { ContextReader } from '..'
+import { LoggerProvider, Logger } from '../io/logger'
 
 export interface ChatMessageRepository {
-  create(message: Message): Promise<void>
+  create(message: Message): ContextReader<void>
 }
 
 const TABLE_NAME = 'chat_messages'
@@ -22,10 +24,17 @@ const commands = {
 }
 
 export class ChatMessageRepositoryImpl implements ChatMessageRepository {
-  constructor(private readonly postgres: Postgres) {}
+  private logger: Logger
 
-  async create(message: Message): Promise<void> {
-    const command = createPreparedQuery(commands, 'create-message', message.room, message.date, message.message)
-    await this.postgres.performQuery(command)
+  constructor(private readonly postgres: Postgres, loggerProvider: LoggerProvider) {
+    this.logger = loggerProvider('ChatMessageRepositoryImpl')
+  }
+
+  create(message: Message): ContextReader<void> {
+    return async context => {
+      const command = createPreparedQuery(commands, 'create-message', message.room, message.date, message.message)
+      this.logger.trace('wrote message to db', context)
+      await this.postgres.performQuery(command)
+    }
   }
 }

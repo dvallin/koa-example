@@ -2,16 +2,23 @@ import * as Koa from 'koa'
 import * as SocketIO from 'socket.io'
 import { Server } from 'http'
 
-import { Mode, SocketHandler } from './'
+// koa request id is nearly impossible to require with import
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const requestId = require('koa-requestid')
 
-async function handleErrors(ctx: Koa.Context, next: () => Promise<{}>) {
-  try {
-    await next()
-  } catch (err) {
-    ctx.status = err.status || 500
-    ctx.body = err.details || err.msg || 'Internal Server Error'
-    if (ctx.status === 500) {
-      console.error(err)
+import { Mode, SocketHandler } from './'
+import { LoggerProvider, Logger } from './io/logger'
+
+function errorHandler(logger: Logger) {
+  return async (ctx: Koa.Context, next: () => Promise<{}>) => {
+    try {
+      await next()
+    } catch (err) {
+      ctx.status = err.status || 500
+      ctx.body = err.details || err.msg || 'Internal Server Error'
+      if (ctx.status === 500) {
+        logger.error(err)
+      }
     }
   }
 }
@@ -25,10 +32,11 @@ export function registerSockets(server: Server, socketHandlers: SocketHandler[])
   socketHandlers.forEach(handler => io.on('connect', socket => handler(io, socket)))
 }
 
-export function build(middlewares: Koa.Middleware[]): Koa {
+export function build(middlewares: Koa.Middleware[], loggerProvider: LoggerProvider): Koa {
   const app = new Koa()
 
-  app.use(handleErrors)
+  app.use(requestId())
+  app.use(errorHandler(loggerProvider('MainErrorHandler')))
   middlewares.forEach(m => app.use(m))
 
   return app
@@ -37,7 +45,7 @@ export function build(middlewares: Koa.Middleware[]): Koa {
 export async function startMode(mode: Mode, port: number | undefined = undefined): Promise<Server> {
   await mode.exports.startup()
   await mode.io.postgres.performTransaction(mode.exports.migrations)
-  const server = await startApp(build(mode.exports.middlewares), port)
+  const server = await startApp(build(mode.exports.middlewares, mode.io.loggerProvider), port)
   server.on('close', mode.exports.shutdown)
   process.on('SIGTERM', () => {
     server.close(() => {

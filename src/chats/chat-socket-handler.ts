@@ -21,7 +21,7 @@ export function buildChatSocketHandler(service: ChatService): SocketHandler {
     socket.on('chat message', message => {
       Object.keys(socket.rooms).forEach(room => {
         const msg: Message = { room, message, date: new Date() }
-        service.received(msg)
+        service.received(msg)({ id: socket.id })
         sendToRoom(server, room, msg)
       })
     })

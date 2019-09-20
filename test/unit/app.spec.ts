@@ -1,5 +1,5 @@
-import { testing } from './test-mode'
-import { MockPostgres } from './database/mock-database'
+import { testing } from '../test-modes'
+import { MockPostgres } from '../test-modes/mock-database'
 import { testMode } from '../test-wrappers'
 
 describe('app', () => {

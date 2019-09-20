@@ -16,6 +16,7 @@ function testServer<T>(
     let from: T
 
     beforeEach(async () => {
+      jest.clearAllMocks()
       from = fromProvider()
       server = await serverProvider(from)
     })

@@ -1,12 +1,13 @@
 import * as request from 'supertest'
-import { testing } from '../test-mode'
+import { testing } from '../../test-modes'
 import { testMode } from '../../test-wrappers'
+import { just } from '../../../src/async-reader'
 
 describe('user controller', () => {
   describe('get user', () => {
     testMode(testing, 'gets a user', async (server, mode) => {
       // given
-      mode.users.repository.get = jest.fn(() => Promise.resolve('mocked user'))
+      mode.users.repository.get = jest.fn(() => just({ name: 'mocked user', email: '/users/user1@gmail.com' }))
 
       // when
       const response = await request(server).get('/users/user1@gmail.com')
@@ -23,7 +24,7 @@ describe('user controller', () => {
 
     testMode(testing, 'validates for correct email', async (server, mode) => {
       // given
-      mode.users.repository.get = jest.fn(() => Promise.resolve('mocked user'))
+      mode.users.repository.get = jest.fn(() => just({ name: 'mocked user', email: '/users/user1@gmail.com' }))
 
       // when
       const response = await request(server).get('/users/user1gmail.com')
@@ -47,7 +48,7 @@ describe('user controller', () => {
   describe('create user', () => {
     testMode(testing, 'create a user', async (server, mode) => {
       // given
-      mode.users.repository.create = jest.fn(() => Promise.resolve())
+      mode.users.repository.create = jest.fn(() => just(null))
 
       // when
       const response = await request(server)
@@ -66,7 +67,7 @@ describe('user controller', () => {
 
     testMode(testing, 'validates users name', async (server, mode) => {
       // given
-      mode.users.repository.create = jest.fn(() => Promise.resolve())
+      mode.users.repository.create = jest.fn(() => just(null))
 
       // when
       const response = await request(server)
@@ -92,7 +93,7 @@ describe('user controller', () => {
 
     testMode(testing, 'validates email', async (server, mode) => {
       // given
-      mode.users.repository.create = jest.fn(() => Promise.resolve())
+      mode.users.repository.create = jest.fn(() => just(null))
 
       // when
       const response = await request(server)

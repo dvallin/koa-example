@@ -1,5 +1,5 @@
-import { testing } from '../test-mode'
-import { MockPostgres } from '../database/mock-database'
+import { testing } from '../../test-modes'
+import { MockPostgres } from '../../test-modes/mock-database'
 import { UserRepository } from '../../../src/users/user-repository'
 
 describe('user repository', () => {
@@ -14,22 +14,23 @@ describe('user repository', () => {
 
   it('gets users', async () => {
     // given
-    postgres.backend.mockReturnValueOnce([{ name: 'mocked user name' }])
+    postgres.backend.mockReturnValueOnce([{ name: 'mocked user name', email: 'mocked email address' }])
 
     // when
-    const userName = await repository.get('id')
+    const user = await repository.get('id')({ id: 'some-tracking' })
 
     // then
-    expect(userName).toEqual('mocked user name')
+    expect(user).toEqual({ name: 'mocked user name', email: 'mocked email address' })
     expect(postgres.backend).toHaveBeenCalledWith({
       name: 'fetch-user',
-      text: 'SELECT name FROM koa_users WHERE email = $1',
+      text: 'SELECT email, name FROM koa_users WHERE email = $1',
       values: ['id'],
     })
   })
+
   it('creates users', async () => {
     // when
-    await repository.create({ name: 'test-name', email: 'test-email' })
+    await repository.create({ name: 'test-name', email: 'test-email' })({ id: 'some-tracking' })
 
     // then
     expect(postgres.backend).toHaveBeenCalledWith({

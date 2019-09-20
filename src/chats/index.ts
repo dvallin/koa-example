@@ -16,7 +16,7 @@ export interface Message {
 }
 
 export function production(io: IO.Components): Module<Components> {
-  const messageRepository = new ChatMessageRepositoryImpl(io.postgres)
+  const messageRepository = new ChatMessageRepositoryImpl(io.postgres, io.loggerProvider)
   const service = new ChatServiceImpl(messageRepository)
   const chatSocketHandler = buildChatSocketHandler(service)
   return {

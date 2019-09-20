@@ -1,8 +1,9 @@
 import * as ws from 'socket.io-client'
-import { testing } from '../test-mode'
 import { testMode } from '../../test-wrappers'
-import { MockPostgres } from '../database/mock-database'
 import { Message } from '../../../src/chats'
+
+import { testing } from '../../test-modes'
+import { MockPostgres } from '../../test-modes/mock-database'
 
 interface SerializedMessage {
   room: string

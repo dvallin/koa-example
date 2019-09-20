@@ -26,9 +26,6 @@ export class NonBlockingPostgres implements Postgres {
     const client = await this.pool.connect()
     try {
       return await Promise.all(queries.map(query => client.query(query)))
-    } catch (e) {
-      console.error(e)
-      throw e
     } finally {
       client.release()
     }

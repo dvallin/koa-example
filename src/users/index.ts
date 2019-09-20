@@ -16,7 +16,7 @@ export interface User {
 }
 
 export function production(io: IO.Components): Module<Components> {
-  const repository = new UserRepositoryImpl(io.postgres)
+  const repository = new UserRepositoryImpl(io.postgres, io.loggerProvider)
   const service = new UserServiceImpl(repository)
   return { components: { repository, service }, exports: { middlewares: [router(service)], migrations: migrations } }
 }

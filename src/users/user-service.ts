@@ -1,19 +1,22 @@
 import { UserRepository } from './user-repository'
 import { User } from '.'
+import { ContextReader } from '..'
+import { map } from '../async-reader'
 
 export interface UserService {
-  get(email: string): Promise<string>
-  create(user: User): Promise<void>
+  get(email: string): ContextReader<string>
+  create(user: User): ContextReader<void>
 }
 
 export class UserServiceImpl implements UserService {
   constructor(private readonly repository: UserRepository) {}
 
-  async get(email: string): Promise<string> {
-    return this.repository.get(email)
+  get(email: string): ContextReader<string> {
+    const user = this.repository.get(email)
+    return map(user, u => u.name)
   }
 
-  async create(user: User): Promise<void> {
+  create(user: User): ContextReader<void> {
     return this.repository.create(user)
   }
 }
