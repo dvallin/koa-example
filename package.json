@@ -7,6 +7,7 @@
     "build": "tsc",
     "lint": "eslint '{src,test}/**/*.{ts,tsx}'",
     "format": "prettier --config .prettierrc.yaml --write '{src,test}/**/*.{ts,tsx,js,jsx,html}'",
+    "format:check": "prettier --config .prettierrc.yaml --list-different'{src,test}/**/*.{ts,tsx,js,jsx,html}'",
     "unit": "jest --config=jest-unit.conf.js --detectOpenHandles",
     "unit:watch": "jest --config=jest-unit.conf.js --watch",
     "integration": "jest --config=jest-integration.conf.js --run-in-band",

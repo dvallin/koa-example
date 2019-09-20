@@ -4,6 +4,9 @@ export interface Postgres {
   performQuery<T>(query: QueryConfig): Promise<QueryResult<T>>
   performQueries<T>(queries: QueryConfig[]): Promise<QueryResult<T>[]>
   performTransaction<T>(queries: QueryConfig[]): Promise<void>
+
+  isConnected: boolean
+  disconnect(): Promise<void>
 }
 
 export function createQuery(text: string): QueryConfig {
@@ -16,7 +19,16 @@ export function createPreparedQuery<K extends string>(commands: { [key in K]: st
 }
 
 export class NonBlockingPostgres implements Postgres {
-  constructor(private readonly pool: Pool) {}
+  public isConnected = false
+
+  constructor(private readonly pool: Pool = new Pool()) {
+    pool.on('connect', () => {
+      this.isConnected = true
+    })
+    pool.on('error', () => {
+      this.isConnected = false
+    })
+  }
 
   async performQuery<T>(query: QueryConfig): Promise<QueryResult<T>> {
     return await this.pool.query(query)
@@ -43,5 +55,9 @@ export class NonBlockingPostgres implements Postgres {
     } finally {
       client.release()
     }
+  }
+
+  disconnect(): Promise<void> {
+    return this.pool.end()
   }
 }

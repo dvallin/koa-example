@@ -47,7 +47,7 @@ export function testModeServer(
     modeProvider,
     async m => {
       const servers = await startMode(m)
-      return [servers.server, servers.managementServer]
+      return [servers.server, servers.instrumentationServer]
     },
     name,
     (servers, mode, ports) => tests(servers[server], mode, ports[server])
