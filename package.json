@@ -11,9 +11,10 @@
     "unit:watch": "jest --config=jest-unit.conf.js --watch",
     "integration": "jest --config=jest-integration.conf.js --run-in-band",
     "integration:watch": "jest --config=jest-integration.conf.js --run-in-band --watch",
+    "dependencies": "node -r ts-node/register ./bin/dependencies.ts",
     "start": "node --inspect=5858 -r ts-node/register ./src/app.ts",
     "start:watch": "nodemon",
-    "dev": "node -r ts-node/register ./bin/dev.ts"
+    "containerize": "docker build -t koa-example:latest ."
   },
   "author": "",
   "license": "ISC",
