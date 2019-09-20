@@ -8,8 +8,10 @@ test_lint_and_format:
   tags:
     - docker
   script:
-    - npm run format
+    - npm install
+    - npm run format:check
     - npm run lint
+    - npm audit
 
 test_unit:
   tags:
@@ -31,4 +33,4 @@ build_and_package:
   script:
     - npm install
     - npm run build
-    - npm run package
+    - npm run containerize

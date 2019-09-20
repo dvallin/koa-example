@@ -9,7 +9,7 @@ const requestId = require('koa-requestid')
 import { Mode, SocketHandler } from './'
 import { LoggerProvider } from './io/logger'
 import { errorHandler } from './instrumentation/error-handler'
-import { management } from './instrumentation/management-handler'
+import { instrumentation } from './instrumentation/instrumentation-handler'
 
 export function startApp(app: Koa, port: number | undefined = undefined): Server {
   return app.listen(port || process.env.SERVER_PORT)
@@ -33,20 +33,20 @@ export function build(middlewares: Koa.Middleware[], loggerProvider: LoggerProvi
 export async function startMode(
   mode: Mode,
   port: number | undefined = undefined,
-  managementPort: number | undefined = undefined
-): Promise<{ server: Server; managementServer: Server }> {
+  instrumentationPort: number | undefined = undefined
+): Promise<{ server: Server; instrumentationServer: Server }> {
   await mode.exports.startup()
   await mode.io.postgres.performTransaction(mode.exports.migrations)
   const server = await startApp(build(mode.exports.middlewares, mode.io.loggerProvider), port)
-  const managementServer = await startApp(build([management()], mode.io.loggerProvider), managementPort)
+  const instrumentationServer = await startApp(build([instrumentation(mode.exports.ready)], mode.io.loggerProvider), instrumentationPort)
   server.on('close', mode.exports.shutdown)
   process.on('SIGTERM', () => {
-    managementServer.close(() => {
+    instrumentationServer.close(() => {
       server.close(() => {
         process.exit(0)
       })
     })
   })
   registerSockets(server, mode.exports.socketHandlers)
-  return { server, managementServer }
+  return { server, instrumentationServer }
 }

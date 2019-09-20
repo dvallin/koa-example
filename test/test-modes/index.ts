@@ -5,9 +5,10 @@ import { mockLogProvider } from './mock-logger'
 import { MockPostgres } from './mock-database'
 
 function testingIo(): Module<IO.Components> {
+  const postgres = new MockPostgres()
   return {
-    components: { postgres: new MockPostgres(), loggerProvider: mockLogProvider(jest.fn()) },
-    exports: {},
+    components: { postgres, loggerProvider: mockLogProvider(jest.fn()) },
+    exports: { ready: () => postgres.isConnected },
   }
 }
 

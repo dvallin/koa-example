@@ -6,6 +6,7 @@ export class MockPostgres implements Postgres {
   public performedQueries: QueryConfig[] = []
   public backend = jest.fn<any[], any>()
 
+  public isConnected = true
   private id = 0
 
   async performQuery<T>(query: QueryConfig): Promise<QueryResult<T>> {
@@ -26,5 +27,9 @@ export class MockPostgres implements Postgres {
 
   async performTransaction(queries: QueryConfig[]): Promise<void> {
     Promise.all(queries.map(q => this.performQuery(q)))
+  }
+
+  disconnect(): Promise<void> {
+    return Promise.resolve()
   }
 }

@@ -23,6 +23,7 @@ export interface ModuleExports {
   middlewares: Middleware[]
   migrations: QueryConfig[]
   socketHandlers: SocketHandler[]
+  ready: () => boolean
 }
 
 export interface Module<T> {
@@ -48,7 +49,8 @@ export function mergeExports(...moduleExports: Partial<ModuleExports>[]): Module
   const migrations = [].concat(...pluck(moduleExports, 'migrations'))
   const middlewares = [].concat(...pluck(moduleExports, 'middlewares'))
   const socketHandlers = [].concat(...pluck(moduleExports, 'socketHandlers'))
-  return { startup, shutdown, migrations, middlewares, socketHandlers }
+  const ready = () => pluck(moduleExports, 'ready').every(ready => ready())
+  return { startup, shutdown, migrations, middlewares, socketHandlers, ready }
 }
 
 export function productionWithIo(io: Module<IO.Components>): Mode {
