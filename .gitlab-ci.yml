@@ -5,21 +5,29 @@ cache:
     - node_modules/
 
 test_lint_and_format:
+  tags:
+    - docker
   script:
-    - npm run fmt
+    - npm run format
     - npm run lint
 
 test_unit:
+  tags:
+    - docker
   script:
     - npm install
     - npm run unit
 
 test_integration:
+  tags:
+    - docker
   script:
     - npm install
     - npm run integration
 
 build_and_package:
+  tags:
+    - docker
   script:
     - npm install
     - npm run build

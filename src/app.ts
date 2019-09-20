@@ -1,4 +1,4 @@
 import { startMode } from './server'
 import { production } from '.'
 
-export const server = startMode(production())
+export const servers = startMode(production(), 8080, 8081)

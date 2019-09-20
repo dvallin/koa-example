@@ -5,34 +5,63 @@ import { startMode, startApp } from '../src/server'
 import { Mode } from '../src'
 import { AddressInfo } from 'net'
 
+function getServerPort(server: Server): number {
+  return (server.address() as AddressInfo).port
+}
+
 function testServer<T>(
   fromProvider: () => T,
-  serverProvider: (from: T) => Promise<Server>,
+  serversProvider: (from: T) => Promise<Server[]>,
   name: string,
-  tests: (server: Server, from: T, port: number) => Promise<void>
+  tests: (server: Server[], from: T, ports: number[]) => Promise<void>
 ): void {
   describe('with running server', () => {
-    let server: Server
+    let servers: Server[]
     let from: T
 
     beforeEach(async () => {
       jest.clearAllMocks()
       from = fromProvider()
-      server = await serverProvider(from)
+      servers = await serversProvider(from)
     })
 
     afterEach(() => {
-      server.close()
+      servers.forEach(s => s.close())
     })
 
-    it(name, async () => tests(server, from, (server.address() as AddressInfo).port))
+    it(name, async () => tests(servers, from, servers.map(s => getServerPort(s))))
   })
 }
 
 export function testApp(appProvider: () => Koa, name: string, tests: (server: Server, app: Koa, port: number) => Promise<void>): void {
-  testServer(appProvider, app => Promise.resolve(startApp(app)), name, tests)
+  testServer(appProvider, app => Promise.resolve([startApp(app)]), name, (servers, mode, ports) => tests(servers[0], mode, ports[0]))
+}
+
+export function testModeServer(
+  modeProvider: () => Mode,
+  name: string,
+  tests: (server: Server, mode: Mode, port: number) => Promise<void>,
+  server: 0 | 1
+): void {
+  testServer(
+    modeProvider,
+    async m => {
+      const servers = await startMode(m)
+      return [servers.server, servers.managementServer]
+    },
+    name,
+    (servers, mode, ports) => tests(servers[server], mode, ports[server])
+  )
 }
 
 export function testMode(modeProvider: () => Mode, name: string, tests: (server: Server, mode: Mode, port: number) => Promise<void>): void {
-  testServer(modeProvider, m => startMode(m), name, tests)
+  testModeServer(modeProvider, name, tests, 0)
+}
+
+export function testManagementMode(
+  modeProvider: () => Mode,
+  name: string,
+  tests: (server: Server, mode: Mode, port: number) => Promise<void>
+): void {
+  testModeServer(modeProvider, name, tests, 1)
 }

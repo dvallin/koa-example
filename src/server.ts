@@ -7,21 +7,9 @@ import { Server } from 'http'
 const requestId = require('koa-requestid')
 
 import { Mode, SocketHandler } from './'
-import { LoggerProvider, Logger } from './io/logger'
-
-function errorHandler(logger: Logger) {
-  return async (ctx: Koa.Context, next: () => Promise<{}>) => {
-    try {
-      await next()
-    } catch (err) {
-      ctx.status = err.status || 500
-      ctx.body = err.details || err.msg || 'Internal Server Error'
-      if (ctx.status === 500) {
-        logger.error(err)
-      }
-    }
-  }
-}
+import { LoggerProvider } from './io/logger'
+import { errorHandler } from './instrumentation/error-handler'
+import { management } from './instrumentation/management-handler'
 
 export function startApp(app: Koa, port: number | undefined = undefined): Server {
   return app.listen(port || process.env.SERVER_PORT)
@@ -42,16 +30,23 @@ export function build(middlewares: Koa.Middleware[], loggerProvider: LoggerProvi
   return app
 }
 
-export async function startMode(mode: Mode, port: number | undefined = undefined): Promise<Server> {
+export async function startMode(
+  mode: Mode,
+  port: number | undefined = undefined,
+  managementPort: number | undefined = undefined
+): Promise<{ server: Server; managementServer: Server }> {
   await mode.exports.startup()
   await mode.io.postgres.performTransaction(mode.exports.migrations)
   const server = await startApp(build(mode.exports.middlewares, mode.io.loggerProvider), port)
+  const managementServer = await startApp(build([management()], mode.io.loggerProvider), managementPort)
   server.on('close', mode.exports.shutdown)
   process.on('SIGTERM', () => {
-    server.close(() => {
-      process.exit(0)
+    managementServer.close(() => {
+      server.close(() => {
+        process.exit(0)
+      })
     })
   })
   registerSockets(server, mode.exports.socketHandlers)
-  return server
+  return { server, managementServer }
 }
