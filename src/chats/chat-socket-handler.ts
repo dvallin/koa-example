@@ -3,6 +3,7 @@ import { wrapSocketHandler, SocketHandler } from '../framework/service/handlers'
 import { ChatService } from './chat-service'
 import { Socket, Server } from 'socket.io'
 import { Message } from '.'
+import { ChatMetrics } from './chat-metrics'
 
 function leaveAllRooms(socket: Socket): void {
   Object.keys(socket.rooms).forEach(room => socket.leave(room))
@@ -12,8 +13,9 @@ function sendToRoom(server: Server, room: string, message: Message): void {
   server.to(room).emit('chat message', message)
 }
 
-export function buildChatSocketHandler(service: ChatService): SocketHandler {
+export function buildChatSocketHandler(service: ChatService, metrics: ChatMetrics): SocketHandler {
   return wrapSocketHandler((server, socket): void => {
+    metrics.openSockets.inc()
     leaveAllRooms(socket)
     socket.on('join', newRoom => {
       leaveAllRooms(socket)
@@ -26,5 +28,6 @@ export function buildChatSocketHandler(service: ChatService): SocketHandler {
         sendToRoom(server, room, msg)
       })
     })
+    socket.on('disconnect', () => metrics.openSockets.dec())
   })
 }

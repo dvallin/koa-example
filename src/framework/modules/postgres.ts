@@ -83,7 +83,7 @@ export interface Components {
   postgres: Postgres
 }
 
-export function production(): Module<{ postgres: Postgres }> {
+export function production(): Module<Components> {
   const postgres = new NonBlockingPostgres()
 
   return {

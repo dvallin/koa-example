@@ -1,10 +1,7 @@
-import { Hook } from '..'
+import { Hook, Handler } from '..'
 
-export interface BatchHandler {
-  type: 'batch'
-  handler: Hook
-}
+export type BatchHandler = Handler<'batch', Hook>
 
 export function wrapBatchHandler(handler: Hook): BatchHandler {
-  return { type: 'batch', handler }
+  return { type: 'batch', handler, priority: 1 }
 }

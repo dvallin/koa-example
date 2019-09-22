@@ -4,7 +4,7 @@ import { UserRepository, UserRepositoryImpl } from './user-repository'
 import { UserService, UserServiceImpl } from './user-service'
 import { router } from './user-router'
 import { Module } from '../framework'
-import { KoaHandler } from '../framework/service/handlers'
+import { ServiceHandler } from '../framework/service/handlers'
 
 export interface Components {
   repository: UserRepository
@@ -16,7 +16,7 @@ export interface User {
   email: string
 }
 
-export function production(io: IO.Components): Module<Components, KoaHandler> {
+export function production(io: IO.Components): Module<Components, ServiceHandler> {
   const repository = new UserRepositoryImpl(io.postgres, io.loggerProvider)
   const service = new UserServiceImpl(repository)
   return { components: { repository, service }, exports: { handlers: [router(service)] } }

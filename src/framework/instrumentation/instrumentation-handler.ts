@@ -1,7 +1,8 @@
 import * as Router from 'koa-router'
-import { KoaHandler, wrapKoaHandler } from '../service/handlers'
+import { InstrumentationHandler, wrapInstrumentationHandler } from '..'
+import { Metrics } from '../metrics'
 
-export function instrumentation(ready: () => boolean): KoaHandler {
+export function instrumentation(ready: () => boolean, metrics: Metrics): InstrumentationHandler {
   const router = new Router()
   router.get('/instrumentation/health', async (ctx, _next) => {
     ctx.status = 200
@@ -9,5 +10,8 @@ export function instrumentation(ready: () => boolean): KoaHandler {
   router.get('/instrumentation/ready', async (ctx, _next) => {
     ctx.status = ready() ? 200 : 500
   })
-  return wrapKoaHandler(router.middleware())
+  router.get('/instrumentation/metrics', async (ctx, _next) => {
+    ctx.body = metrics.asString()
+  })
+  return wrapInstrumentationHandler(router.middleware())
 }

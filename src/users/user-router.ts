@@ -3,7 +3,7 @@ import { UserService } from './user-service'
 import { Middleware, Context } from 'koa'
 import { User } from '.'
 import { get, post } from '../framework/service/router-utils'
-import { KoaHandler, wrapKoaHandler } from '../framework/service/handlers'
+import { ServiceHandler, wrapKoaHandler } from '../framework/service/handlers'
 
 const joi = Router.Joi
 const email = joi
@@ -17,7 +17,7 @@ const name = joi
 const getUserParameters = { email }
 const createUserBody = { name, email }
 
-export function router(service: UserService): KoaHandler {
+export function router(service: UserService): ServiceHandler {
   const router = Router()
 
   router.route(

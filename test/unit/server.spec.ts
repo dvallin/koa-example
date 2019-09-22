@@ -25,7 +25,7 @@ describe('server', () => {
       logProvider('log-request').trace(JSON.stringify(ctx.state))
     })
 
-    return build([wrapKoaHandler(router.middleware())], logProvider)
+    return build([wrapKoaHandler(router.middleware())], logProvider('Main'))
   }
 
   testApp(exampleApp, 'succeeds', async server => {
@@ -41,7 +41,7 @@ describe('server', () => {
 
     expect(response.status).toEqual(500)
     expect(response.text).toEqual('Internal Server Error')
-    expect(logSink).toHaveBeenCalledWith('MainErrorHandler', 'error', new Error('something bad happened'), undefined)
+    expect(logSink).toHaveBeenCalledWith('Main', 'error', new Error('something bad happened'), undefined)
   })
 
   testApp(exampleApp, 'creates request id', async server => {

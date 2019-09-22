@@ -2,6 +2,7 @@ import { testing } from '../test-modes'
 import { MockPostgres } from '../test-modes/mock-database'
 import { testMode, testManagementMode } from '../test-runners'
 import * as request from 'supertest'
+import { MockPrometheus } from '../test-modes/mock-prometheus'
 
 describe('app', () => {
   testMode(testing, 'registers migrations', async (_server, mode) => {
@@ -32,5 +33,10 @@ describe('app', () => {
     expect(response.status).toBe(500)
     expect(response.text).toEqual('Internal Server Error')
     expect(response.body).toEqual({})
+  })
+
+  testManagementMode(testing, 'registers metrics', async (_server, mode) => {
+    const metrics = mode.exports.metrics as MockPrometheus
+    expect(metrics.registry).toHaveBeenCalledWith('chats', 'openSockets', 'gauge', 'open sockets')
   })
 })

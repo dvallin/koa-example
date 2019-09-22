@@ -26,6 +26,7 @@
     "koa-router": "^7.4.0",
     "log4js": "^5.1.0",
     "pg": "^7.12.1",
+    "prom-client": "^11.5.3",
     "socket.io": "^2.2.0"
   },
   "devDependencies": {

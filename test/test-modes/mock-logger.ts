@@ -2,7 +2,7 @@ import { RequestContext } from '../../src/framework/request-context'
 import { Logger, LoggerProvider } from '../../src/framework/logger'
 
 export class MockLogger implements Logger {
-  constructor(private readonly name: string, public readonly logSink: jest.Mock<any, any>) {}
+  constructor(private readonly name: string, public readonly logSink: jest.Mock<any>) {}
 
   error(message: string, traceId?: RequestContext): void {
     this.logSink(this.name, 'error', message, traceId)
@@ -18,5 +18,5 @@ export class MockLogger implements Logger {
   }
 }
 
-export const mockLogProvider: (logSink: jest.Mock<any, any>) => LoggerProvider = (logSink: jest.Mock<any, any>) => (name: string) =>
+export const mockLogProvider: (logSink: jest.Mock<any>) => LoggerProvider = (logSink: jest.Mock<any>) => (name: string) =>
   new MockLogger(name, logSink)

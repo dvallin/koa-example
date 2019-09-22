@@ -1,8 +1,8 @@
-import { KoaHandler, wrapKoaHandler } from '../service/handlers'
 import { Logger } from '../logger'
+import { Middleware } from 'koa'
 
-export function errorHandler(logger: Logger): KoaHandler {
-  return wrapKoaHandler(async (ctx, next) => {
+export function errorHandler(logger: Logger): Middleware {
+  return async (ctx, next) => {
     try {
       await next()
     } catch (err) {
@@ -12,5 +12,5 @@ export function errorHandler(logger: Logger): KoaHandler {
         logger.error(err)
       }
     }
-  })
+  }
 }

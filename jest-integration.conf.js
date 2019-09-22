@@ -7,6 +7,7 @@ module.exports = {
   transform: {
     '^.+\\.ts$': '<rootDir>/node_modules/ts-jest',
   },
+  testEnvironment: 'node',
   globalSetup: '<rootDir>/test/integration/setup.js',
   globalTeardown: '<rootDir>/test/integration/teardown.js',
 }
