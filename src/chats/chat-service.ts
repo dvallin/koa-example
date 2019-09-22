@@ -1,6 +1,7 @@
+import { ContextReader } from '../framework/request-context'
+
 import { ChatMessageRepository } from './chat-message-repository'
 import { Message } from '.'
-import { ContextReader } from '..'
 
 export interface ChatService {
   received(message: Message): ContextReader<void>

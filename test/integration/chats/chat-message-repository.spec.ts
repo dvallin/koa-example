@@ -1,4 +1,4 @@
-import { testMode } from '../../test-wrappers'
+import { testMode } from '../../test-runners'
 import { production } from '../../../src'
 import { Message } from '../../../src/chats'
 import { cleanDatabase } from '../testData'
@@ -12,10 +12,10 @@ describe('chat message repository', () => {
     const now = new Date()
 
     // when
-    await mode.chats.messageRepository.create({ room: 'some room', date: now, message: 'some message' })({ id: 'tracing-id' })
+    await mode.components.chats.messageRepository.create({ room: 'some room', date: now, message: 'some message' })({ id: 'tracing-id' })
 
     // then
-    const result = await mode.io.postgres.performQuery<Message>({ text: `SELECT * FROM chat_messages;` })
+    const result = await mode.components.io.postgres.performQuery<Message>({ text: `SELECT * FROM chat_messages;` })
     expect(result.rowCount).toEqual(1)
     expect(result.rows[0]).toEqual({ room: 'some room', date: now, message: 'some message' })
 
@@ -28,7 +28,7 @@ describe('chat message repository', () => {
     const now = new Date()
 
     // when
-    await mode.chats.messageRepository.create({ room: 'some room', date: now, message: 'some message' })({ id: 'tracing-id' })
+    await mode.components.chats.messageRepository.create({ room: 'some room', date: now, message: 'some message' })({ id: 'tracing-id' })
 
     // then
     expect(logSink).toHaveBeenCalledWith('ChatMessageRepositoryImpl', 'trace', 'wrote message to db', { id: 'tracing-id' })

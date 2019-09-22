@@ -1,13 +1,13 @@
 import * as request from 'supertest'
 import { testing } from '../../test-modes'
-import { testMode } from '../../test-wrappers'
-import { just } from '../../../src/async-reader'
+import { testMode } from '../../test-runners'
+import { just } from '../../../src/framework/async-reader'
 
 describe('user controller', () => {
   describe('get user', () => {
     testMode(testing, 'gets a user', async (server, mode) => {
       // given
-      mode.users.repository.get = jest.fn(() => just({ name: 'mocked user', email: '/users/user1@gmail.com' }))
+      mode.components.users.repository.get = jest.fn(() => just({ name: 'mocked user', email: '/users/user1@gmail.com' }))
 
       // when
       const response = await request(server).get('/users/user1@gmail.com')
@@ -19,12 +19,12 @@ describe('user controller', () => {
       expect(response.text).toEqual('mocked user')
       expect(response.body).toEqual({})
 
-      expect(mode.users.repository.get).toHaveBeenCalledWith('user1@gmail.com')
+      expect(mode.components.users.repository.get).toHaveBeenCalledWith('user1@gmail.com')
     })
 
     testMode(testing, 'validates for correct email', async (server, mode) => {
       // given
-      mode.users.repository.get = jest.fn(() => just({ name: 'mocked user', email: '/users/user1@gmail.com' }))
+      mode.components.users.repository.get = jest.fn(() => just({ name: 'mocked user', email: '/users/user1@gmail.com' }))
 
       // when
       const response = await request(server).get('/users/user1gmail.com')
@@ -41,14 +41,14 @@ describe('user controller', () => {
         },
       ])
 
-      expect(mode.users.repository.get).not.toHaveBeenCalled()
+      expect(mode.components.users.repository.get).not.toHaveBeenCalled()
     })
   })
 
   describe('create user', () => {
     testMode(testing, 'create a user', async (server, mode) => {
       // given
-      mode.users.repository.create = jest.fn(() => just(null))
+      mode.components.users.repository.create = jest.fn(() => just(null))
 
       // when
       const response = await request(server)
@@ -62,12 +62,12 @@ describe('user controller', () => {
       expect(response.type).toEqual('text/plain')
       expect(response.text).toEqual('Created')
 
-      expect(mode.users.repository.create).toHaveBeenCalledWith({ name: 'john', email: 'john@doe.com' })
+      expect(mode.components.users.repository.create).toHaveBeenCalledWith({ name: 'john', email: 'john@doe.com' })
     })
 
     testMode(testing, 'validates users name', async (server, mode) => {
       // given
-      mode.users.repository.create = jest.fn(() => just(null))
+      mode.components.users.repository.create = jest.fn(() => just(null))
 
       // when
       const response = await request(server)
@@ -88,12 +88,12 @@ describe('user controller', () => {
         },
       ])
 
-      expect(mode.users.repository.create).not.toHaveBeenCalled()
+      expect(mode.components.users.repository.create).not.toHaveBeenCalled()
     })
 
     testMode(testing, 'validates email', async (server, mode) => {
       // given
-      mode.users.repository.create = jest.fn(() => just(null))
+      mode.components.users.repository.create = jest.fn(() => just(null))
 
       // when
       const response = await request(server)
@@ -114,7 +114,7 @@ describe('user controller', () => {
         },
       ])
 
-      expect(mode.users.repository.create).not.toHaveBeenCalled()
+      expect(mode.components.users.repository.create).not.toHaveBeenCalled()
     })
   })
 })

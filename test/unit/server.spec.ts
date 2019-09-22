@@ -2,10 +2,11 @@ import * as Koa from 'koa'
 import * as Router from 'koa-router'
 import * as request from 'supertest'
 
-import { build } from '../../src/server'
-import { testApp } from '../test-wrappers'
+import { testApp } from '../test-runners'
 import { mockLogProvider } from '../test-modes/mock-logger'
 import { getCallArgument } from '../jest-utils'
+import { wrapKoaHandler } from '../../src/framework/service/handlers'
+import { build } from '../../src/framework/server'
 
 describe('server', () => {
   const logSink = jest.fn()
@@ -24,7 +25,7 @@ describe('server', () => {
       logProvider('log-request').trace(JSON.stringify(ctx.state))
     })
 
-    return build([router.middleware()], logProvider)
+    return build([wrapKoaHandler(router.middleware())], logProvider)
   }
 
   testApp(exampleApp, 'succeeds', async server => {

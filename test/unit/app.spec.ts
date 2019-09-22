@@ -1,12 +1,12 @@
 import { testing } from '../test-modes'
 import { MockPostgres } from '../test-modes/mock-database'
-import { testMode, testManagementMode } from '../test-wrappers'
+import { testMode, testManagementMode } from '../test-runners'
 import * as request from 'supertest'
 
 describe('app', () => {
-  testMode(testing, 'performs migrations', async (_server, mode) => {
-    const postgres = mode.io.postgres as MockPostgres
-    expect(postgres.performedQueries).toMatchSnapshot()
+  testMode(testing, 'registers migrations', async (_server, mode) => {
+    const postgres = mode.components.io.postgres as MockPostgres
+    expect(postgres.migrations).toMatchSnapshot()
   })
 
   testManagementMode(testing, 'becomes healthy', async server => {
@@ -24,7 +24,7 @@ describe('app', () => {
   })
 
   testManagementMode(testing, 'becomes unready if postgres is disconnected', async (server, mode) => {
-    const postgres = mode.io.postgres as MockPostgres
+    const postgres = mode.components.io.postgres as MockPostgres
     postgres.isConnected = false
 
     const response = await request(server).get('/instrumentation/ready')

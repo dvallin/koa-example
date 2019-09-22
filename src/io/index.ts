@@ -1,26 +1,14 @@
-import { Postgres, NonBlockingPostgres } from './postgres'
-import { Module } from '..'
-import { LoggerProvider, ofLog4Js } from './logger'
-import * as Log4Js from 'log4js'
+import * as Log4Js from '../framework/modules/log4js'
+import * as Postgres from '../framework/modules/postgres'
+import { Module, mergeExports } from '../framework'
 
-export interface Components {
-  postgres: Postgres
-  loggerProvider: LoggerProvider
-}
+export type Components = Log4Js.Components & Postgres.Components
 
 export function production(): Module<Components> {
-  const log4Js = Log4Js.configure({
-    appenders: { out: { type: 'stdout' } },
-    categories: { default: { appenders: ['out'], level: 'info' } },
-  })
-
-  const postgres = new NonBlockingPostgres()
-
+  const logger = Log4Js.production()
+  const postgres = Postgres.production()
   return {
-    components: { postgres, loggerProvider: ofLog4Js(log4Js) },
-    exports: {
-      shutdown: (): Promise<void> => postgres.disconnect(),
-      ready: () => postgres.isConnected,
-    },
+    components: { ...logger.components, ...postgres.components },
+    exports: mergeExports(logger.exports, postgres.exports),
   }
 }

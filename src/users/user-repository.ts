@@ -1,8 +1,8 @@
-import { Postgres, createQuery, createPreparedQuery } from '../io/postgres'
+import { Postgres, createQuery, createPreparedQuery } from '../framework/modules/postgres'
 import { QueryConfig } from 'pg'
 import { User } from '.'
-import { ContextReader } from '..'
-import { LoggerProvider, Logger } from '../io/logger'
+import { Logger, LoggerProvider } from '../framework/logger'
+import { ContextReader } from '../framework/request-context'
 
 export interface UserRepository {
   get(email: string): ContextReader<User>
@@ -11,7 +11,7 @@ export interface UserRepository {
 
 const TABLE_NAME = 'koa_users'
 
-export const migrations: QueryConfig[] = [
+const migrations: QueryConfig[] = [
   `CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (
         email  VARCHAR(45) PRIMARY KEY,
         name   VARCHAR(45)
@@ -28,6 +28,7 @@ export class UserRepositoryImpl implements UserRepository {
 
   constructor(private readonly postgres: Postgres, loggerProvider: LoggerProvider) {
     this.logger = loggerProvider('UserRepositoryImpl')
+    postgres.registerMigrations(migrations)
   }
 
   get(email: string): ContextReader<User> {

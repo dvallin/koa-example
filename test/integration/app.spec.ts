@@ -1,4 +1,4 @@
-import { testManagementMode } from '../test-wrappers'
+import { testManagementMode } from '../test-runners'
 import * as request from 'supertest'
 import { production } from '../../src'
 

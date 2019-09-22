@@ -1,7 +1,8 @@
+import { map } from '../framework/async-reader'
+import { ContextReader } from '../framework/request-context'
+
 import { UserRepository } from './user-repository'
 import { User } from '.'
-import { ContextReader } from '..'
-import { map } from '../async-reader'
 
 export interface UserService {
   get(email: string): ContextReader<string>

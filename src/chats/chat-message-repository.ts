@@ -1,8 +1,9 @@
-import { Postgres, createQuery, createPreparedQuery } from '../io/postgres'
+import { Postgres, createQuery, createPreparedQuery } from '../framework/modules/postgres'
+import { ContextReader } from '../framework/request-context'
+import { LoggerProvider, Logger } from '../framework/logger'
+
 import { QueryConfig } from 'pg'
 import { Message } from '.'
-import { ContextReader } from '..'
-import { LoggerProvider, Logger } from '../io/logger'
 
 export interface ChatMessageRepository {
   create(message: Message): ContextReader<void>
@@ -10,7 +11,7 @@ export interface ChatMessageRepository {
 
 const TABLE_NAME = 'chat_messages'
 
-export const migrations: QueryConfig[] = [
+const migrations: QueryConfig[] = [
   `CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (
         room  VARCHAR(45),
         date  TIMESTAMP,
@@ -28,6 +29,7 @@ export class ChatMessageRepositoryImpl implements ChatMessageRepository {
 
   constructor(private readonly postgres: Postgres, loggerProvider: LoggerProvider) {
     this.logger = loggerProvider('ChatMessageRepositoryImpl')
+    postgres.registerMigrations(migrations)
   }
 
   create(message: Message): ContextReader<void> {

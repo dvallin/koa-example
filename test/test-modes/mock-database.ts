@@ -1,9 +1,10 @@
 import { QueryResult, QueryConfig } from 'pg'
 
-import { Postgres } from '../../src/io/postgres'
+import { Postgres } from '../../src/framework/modules/postgres'
 
 export class MockPostgres implements Postgres {
   public performedQueries: QueryConfig[] = []
+  public migrations: QueryConfig[] = []
   public backend = jest.fn<any[], any>()
 
   public isConnected = true
@@ -31,5 +32,13 @@ export class MockPostgres implements Postgres {
 
   disconnect(): Promise<void> {
     return Promise.resolve()
+  }
+
+  performMigrations(): Promise<void> {
+    return this.performTransaction(this.migrations)
+  }
+
+  registerMigrations(queries: QueryConfig[]) {
+    this.migrations = this.migrations.concat(queries)
   }
 }

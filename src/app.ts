@@ -1,4 +1,4 @@
-import { startMode } from './server'
+import { runMode } from './framework/service/runner'
 import { production } from '.'
 
-export const servers = startMode(production(), 8080, 8081)
+export const servers = runMode(production(), 8080, 8081)

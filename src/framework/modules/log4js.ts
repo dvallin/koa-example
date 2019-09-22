@@ -1,15 +1,7 @@
 import * as Log4Js from 'log4js'
-import { RequestContext } from '..'
-
-export interface LoggerProvider {
-  (name: string): Logger
-}
-export interface Logger {
-  error(message: string, context?: RequestContext): void
-  warn(message: string, context?: RequestContext): void
-  debug(message: string, context?: RequestContext): void
-  trace(message: string, context?: RequestContext): void
-}
+import { RequestContext } from '../request-context'
+import { LoggerProvider } from '../logger'
+import { Module } from '..'
 
 function format(message: string, context: RequestContext | undefined): string {
   const relevantContext: Partial<{ id: string }> = context || {}
@@ -36,5 +28,21 @@ export class Log4JsLogger {
 export function ofLog4Js(log4Js: Log4Js.Log4js): LoggerProvider {
   return name => {
     return new Log4JsLogger(log4Js.getLogger(name))
+  }
+}
+
+export interface Components {
+  loggerProvider: LoggerProvider
+}
+
+export function production(): Module<Components> {
+  const log4Js = Log4Js.configure({
+    appenders: { out: { type: 'stdout' } },
+    categories: { default: { appenders: ['out'], level: 'info' } },
+  })
+
+  return {
+    components: { loggerProvider: ofLog4Js(log4Js) },
+    exports: {},
   }
 }

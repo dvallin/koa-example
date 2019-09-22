@@ -1,9 +1,10 @@
-import { SocketHandler } from '..'
+import { wrapSocketHandler, SocketHandler } from '../framework/service/handlers'
+
 import { ChatService } from './chat-service'
 import { Socket, Server } from 'socket.io'
 import { Message } from '.'
 
-function leavAllRooms(socket: Socket): void {
+function leaveAllRooms(socket: Socket): void {
   Object.keys(socket.rooms).forEach(room => socket.leave(room))
 }
 
@@ -12,10 +13,10 @@ function sendToRoom(server: Server, room: string, message: Message): void {
 }
 
 export function buildChatSocketHandler(service: ChatService): SocketHandler {
-  return (server, socket): void => {
-    leavAllRooms(socket)
+  return wrapSocketHandler((server, socket): void => {
+    leaveAllRooms(socket)
     socket.on('join', newRoom => {
-      leavAllRooms(socket)
+      leaveAllRooms(socket)
       socket.join(newRoom)
     })
     socket.on('chat message', message => {
@@ -25,5 +26,5 @@ export function buildChatSocketHandler(service: ChatService): SocketHandler {
         sendToRoom(server, room, msg)
       })
     })
-  }
+  })
 }

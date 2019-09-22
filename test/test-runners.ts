@@ -1,9 +1,10 @@
 import * as Koa from 'koa'
 import { Server } from 'http'
 
-import { startMode, startApp } from '../src/server'
-import { Mode } from '../src'
+import { runMode, KoaHandlers } from '../src/framework/service/runner'
 import { AddressInfo } from 'net'
+import { ModeBase } from '../src/framework'
+import { startApp } from '../src/framework/server'
 
 function getServerPort(server: Server): number {
   return (server.address() as AddressInfo).port
@@ -37,16 +38,16 @@ export function testApp(appProvider: () => Koa, name: string, tests: (server: Se
   testServer(appProvider, app => Promise.resolve([startApp(app)]), name, (servers, mode, ports) => tests(servers[0], mode, ports[0]))
 }
 
-export function testModeServer(
-  modeProvider: () => Mode,
+export function testModeServer<T extends ModeBase<KoaHandlers>>(
+  modeProvider: () => T,
   name: string,
-  tests: (server: Server, mode: Mode, port: number) => Promise<void>,
+  tests: (server: Server, mode: T, port: number) => Promise<void>,
   server: 0 | 1
 ): void {
   testServer(
     modeProvider,
     async m => {
-      const servers = await startMode(m)
+      const servers = await runMode(m)
       return [servers.server, servers.instrumentationServer]
     },
     name,
@@ -54,14 +55,18 @@ export function testModeServer(
   )
 }
 
-export function testMode(modeProvider: () => Mode, name: string, tests: (server: Server, mode: Mode, port: number) => Promise<void>): void {
+export function testMode<T extends ModeBase<KoaHandlers>>(
+  modeProvider: () => T,
+  name: string,
+  tests: (server: Server, mode: T, port: number) => Promise<void>
+): void {
   testModeServer(modeProvider, name, tests, 0)
 }
 
-export function testManagementMode(
-  modeProvider: () => Mode,
+export function testManagementMode<T extends ModeBase<KoaHandlers>>(
+  modeProvider: () => T,
   name: string,
-  tests: (server: Server, mode: Mode, port: number) => Promise<void>
+  tests: (server: Server, mode: T, port: number) => Promise<void>
 ): void {
   testModeServer(modeProvider, name, tests, 1)
 }

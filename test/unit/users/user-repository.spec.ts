@@ -7,9 +7,9 @@ describe('user repository', () => {
   let repository: UserRepository
 
   beforeEach(() => {
-    const context = testing()
-    postgres = context.io.postgres as MockPostgres
-    repository = context.users.repository
+    const mode = testing()
+    postgres = mode.components.io.postgres as MockPostgres
+    repository = mode.components.users.repository
   })
 
   it('gets users', async () => {

@@ -1,69 +1,32 @@
 import * as Users from './users'
 import * as Chats from './chats'
 import * as IO from './io'
-import { pluck } from './array-utils'
-import { QueryConfig } from 'pg'
-import { Middleware } from 'koa'
-import { Socket, Server } from 'socket.io'
-import { AsyncReader } from './async-reader'
 
-export type Hook = () => Promise<void>
-export type SocketHandler = (server: Server, socket: Socket) => void
+import { Module, Mode, mergeExports } from './framework'
+import { KoaHandlers } from './framework/service/runner'
 
-export interface RequestContext {
-  id: string
-}
-
-export type ContextReader<T> = AsyncReader<RequestContext, T>
-
-export interface ModuleExports {
-  startup: Hook
-  shutdown: Hook
-
-  middlewares: Middleware[]
-  migrations: QueryConfig[]
-  socketHandlers: SocketHandler[]
-  ready: () => boolean
-}
-
-export interface Module<T> {
-  components: T
-  exports: Partial<ModuleExports>
-}
-
-export interface Mode {
+export interface Components {
   io: IO.Components
   users: Users.Components
   chats: Chats.Components
-
-  exports: ModuleExports
 }
 
-async function callHooks(hooks: Hook[]): Promise<void> {
-  await Promise.all(hooks.map(hook => hook()))
-}
+export type AppMode = Mode<Components, KoaHandlers>
 
-export function mergeExports(...moduleExports: Partial<ModuleExports>[]): ModuleExports {
-  const startup = (): Promise<void> => callHooks(pluck(moduleExports, 'startup'))
-  const shutdown = (): Promise<void> => callHooks(pluck(moduleExports, 'shutdown'))
-  const migrations = [].concat(...pluck(moduleExports, 'migrations'))
-  const middlewares = [].concat(...pluck(moduleExports, 'middlewares'))
-  const socketHandlers = [].concat(...pluck(moduleExports, 'socketHandlers'))
-  const ready = () => pluck(moduleExports, 'ready').every(ready => ready())
-  return { startup, shutdown, migrations, middlewares, socketHandlers, ready }
-}
-
-export function productionWithIo(io: Module<IO.Components>): Mode {
+export function productionWithIo(io: Module<IO.Components>): AppMode {
   const users = Users.production(io.components)
   const chats = Chats.production(io.components)
   return {
-    io: io.components,
-    users: users.components,
-    chats: chats.components,
-    exports: mergeExports(io.exports, users.exports, chats.exports),
+    components: {
+      io: io.components,
+      users: users.components,
+      chats: chats.components,
+    },
+    loggerProvider: io.components.loggerProvider,
+    exports: mergeExports<KoaHandlers>(io.exports, users.exports, chats.exports),
   }
 }
 
-export function production(): Mode {
+export function production(): AppMode {
   return productionWithIo(IO.production())
 }

@@ -1,5 +1,5 @@
 import * as ws from 'socket.io-client'
-import { testMode } from '../../test-wrappers'
+import { testMode } from '../../test-runners'
 import { Message } from '../../../src/chats'
 
 import { testing } from '../../test-modes'
@@ -14,7 +14,7 @@ interface SerializedMessage {
 describe('chat socket', () => {
   testMode(testing, 'can join room and send messages to it', async (_server, mode, port) => {
     return new Promise(resolve => {
-      const postgres = mode.io.postgres as MockPostgres
+      const postgres = mode.components.io.postgres as MockPostgres
       const socket1Messages: Message[] = []
       const socket2Messages: Message[] = []
 

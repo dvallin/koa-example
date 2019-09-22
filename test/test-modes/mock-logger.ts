@@ -1,5 +1,5 @@
-import { Logger, LoggerProvider } from '../../src/io/logger'
-import { RequestContext } from '../../src'
+import { RequestContext } from '../../src/framework/request-context'
+import { Logger, LoggerProvider } from '../../src/framework/logger'
 
 export class MockLogger implements Logger {
   constructor(private readonly name: string, public readonly logSink: jest.Mock<any, any>) {}

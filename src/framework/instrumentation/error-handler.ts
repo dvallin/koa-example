@@ -1,8 +1,8 @@
-import * as Koa from 'koa'
-import { Logger } from '../io/logger'
+import { KoaHandler, wrapKoaHandler } from '../service/handlers'
+import { Logger } from '../logger'
 
-export function errorHandler(logger: Logger) {
-  return async (ctx: Koa.Context, next: () => Promise<{}>) => {
+export function errorHandler(logger: Logger): KoaHandler {
+  return wrapKoaHandler(async (ctx, next) => {
     try {
       await next()
     } catch (err) {
@@ -12,5 +12,5 @@ export function errorHandler(logger: Logger) {
         logger.error(err)
       }
     }
-  }
+  })
 }
